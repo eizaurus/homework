@@ -1,3 +1,4 @@
+'use client';
 import { Box, Typography } from '@mui/material';
 
 export default function StatsFooter({ count }: { count: number }) {

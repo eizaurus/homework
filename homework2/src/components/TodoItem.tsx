@@ -1,78 +1,41 @@
 'use client';
-import { MutateCheck, MutateDelete, queryClient } from '@/lib/queryClient';
-import { ItemTodo } from '@/types/todo';
-import { ListItem, Checkbox, ListItemText, IconButton, ListItemIcon } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { Checkbox, IconButton, ListItem, ListItemText } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ToDoInput from './TodoInput';
-export const TaskItem = ({ task, index }: { task: ItemTodo; index: number }) => {
-	const [title, setTitle] = useState(task.title);
-	const [check, setChecked] = useState(task.completed);
-	const [editTask, setEditTask] = useState(false);
-	const changeToggle = useMutation({
-		mutationFn: (variables: { id: number; title?: string; completed?: boolean; isDelete?: boolean }) => MutateCheck(variables),
-		onError: (error, variables) => {
-			console.error('Error:', error);
-			console.log('Failed post data:', variables);
-		},
-		onSuccess: (variables) => {
-			console.log('Success:', variables);
-			queryClient.invalidateQueries(['todos']);
-		},
-		onSettled: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
-	});
-	const DeleteTask = useMutation({
-		mutationFn: (variables: { id: number; isDelete: boolean }) => MutateDelete(variables),
-		onError: (error, variables) => {
-			console.error('Error:', error);
-			console.log('Failed post data:', variables);
-		},
-		onSuccess: (variables) => {
-			console.log('Success:', variables);
-			queryClient.invalidateQueries(['todos']);
-		},
-		onSettled: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
-	});
+import { useState } from 'react';
+import { Todo } from '../types/todo';
+import { useDeleteTodo, useUpdateTodo } from '@/lib/api';
+import TodoInput from './TodoInput';
+
+export default function TodoItem({ todo }: { todo: Todo }) {
+	const [editing, setEditing] = useState(false);
+	
+	const updateMutation = useUpdateTodo();
+
+	const deleteMutation = useDeleteTodo();
+	const handleToggle = () => {
+		updateMutation.mutate({ ...todo, completed: !todo.completed });
+	};
 	return (
 		<ListItem
 			secondaryAction={
-				<IconButton
-					edge='end'
-					aria-label='comments'
-					onClick={() => {
-						DeleteTask.mutate({ id: task.id, isDelete: true });
-					}}
-				>
+				<IconButton edge='end' onClick={() => deleteMutation.mutate(todo.id)}>
 					<DeleteIcon />
 				</IconButton>
 			}
+			disablePadding
 		>
-			<ListItemIcon>
-				<Checkbox
-					edge='end'
-					onChange={(e) => {
-						setChecked(e.target.checked);
-						changeToggle.mutate({ id: task.id, completed: e.target.checked });
-					}}
-					checked={check}
-					slotProps={{ input: { 'aria-labelledby': `todolist-checkbox-${index}` } }}
-				/>
-			</ListItemIcon>
-			{editTask ? (
-				<ToDoInput
-					title={title}
-					changeValue={(event: React.ChangeEvent<HTMLInputElement>) => {
-						setTitle(event.target.value);
-					}}
-					SendData={() => {
-						changeToggle.mutate({ id: task.id, title: title });
-						setEditTask(false);
+			<Checkbox checked={todo.completed} onChange={handleToggle} />
+			{editing ? (
+				<TodoInput
+					initialValue={todo.title}
+					onAdd={(value) => {
+						updateMutation.mutate({ ...todo, title: value });
+						setEditing(false);
 					}}
 				/>
 			) : (
-				<ListItemText primary={title} secondary={task.userId} sx={{ textDecorationLine: check ? 'line-through' : 'none', cursor: 'pointer' }} onDoubleClick={() => setEditTask(true)} />
+				<ListItemText primary={todo.title} onDoubleClick={() => setEditing(true)} sx={{ cursor: 'pointer' }} />
 			)}
 		</ListItem>
 	);
-};
+}

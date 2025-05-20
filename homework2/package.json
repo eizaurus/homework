@@ -19,7 +19,8 @@
     "dayjs": "^1.11.13",
     "next": "15.4.0-canary.35",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-router": "^7.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

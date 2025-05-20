@@ -1,20 +1,16 @@
 import { Dayjs } from 'dayjs';
 
-export type ItemTodo = {
+export interface Todo {
 	userId: number;
 	id: number;
 	title: string;
 	completed: boolean;
-	createdAt: Dayjs;
-	updatedAt: Dayjs | null;
-};
+	createdAt: Dayjs | string;
+	updatedAt: Dayjs | string;
+}
+export interface Props {
+	params: { id: string };
+}
 export interface TodoListProps {
-	children?: React.ReactNode;
-}
-export interface TabPanelProps {
-	children?: React.ReactNode;
-}
-export interface FilterTabsProps {
-	children?: React.ReactNode;
-	count: number;
+	filter: 'all' | 'active' | 'completed';
 }

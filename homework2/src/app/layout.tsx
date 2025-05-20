@@ -1,20 +1,28 @@
-'use client';
-import { loadData, queryClient } from '@/lib/queryClient';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { ReactNode } from 'react';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import React from 'react';
+import { queryClient } from '@/lib/queryClient';
+import Providers from './providers';
+import useLocalTodos from '@/hooks/useLocalTodos';
+async function getDehydratedState() {
+	const todos = useLocalTodos();
+	queryClient.setQueryData(['todos'], () => todos);
+	const dehydratedState = dehydrate(queryClient);
+	return dehydratedState;
+}
+export default async function RootLayout({ children }: { children: ReactNode }) {
+	const dehydratedState = await getDehydratedState();
 
-export default function RootLayout({
-	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
 	return (
-		<QueryClientProvider client={queryClient}>
-			<ReactQueryDevtools initialIsOpen={true} />
-			<html lang='en'>
-				<body style={{ margin: 0, padding: 0 }}>{children}</body>
-			</html>
-		</QueryClientProvider>
+		<html lang='ru'>
+			<body>
+				<Providers>
+					<HydrationBoundary state={dehydratedState}>
+						<ReactQueryDevtools initialIsOpen={true} />
+						{children}
+					</HydrationBoundary>
+				</Providers>
+			</body>
+		</html>
 	);
 }

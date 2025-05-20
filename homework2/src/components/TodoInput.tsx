@@ -1,29 +1,34 @@
-import { TextField, InputAdornment, IconButton } from '@mui/material';
+'use client';
+import { useState } from 'react';
+import { TextField, IconButton, InputAdornment } from '@mui/material';
 import DoneIcon from '@mui/icons-material/Done';
 
-export default function ToDoInput({ title, changeValue, SendData }: { title: string; changeValue: any; SendData: any }) {
-	const handleMouse = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
+export default function TodoInput({ onAdd, initialValue = '' }: { initialValue?: string; onAdd: (title: string) => void }) {
+	const [title, setTitle] = useState(initialValue);
+	const handleSubmit = () => {
+		if (title.trim()) {
+			onAdd(title);
+			setTitle('');
+		}
 	};
 	return (
 		<TextField
 			fullWidth
-			id='outlined-search'
-			label='Search field'
-			type='search'
+			label='Добавить задачу'
 			value={title}
-			onChange={changeValue}
+			onChange={(e) => setTitle(e.target.value)}
 			slotProps={{
 				input: {
 					endAdornment: (
 						<InputAdornment position='end'>
-							<IconButton aria-label={'change Task text'} onClick={SendData} onMouseDown={handleMouse} onMouseUp={handleMouse} edge='end'>
+							<IconButton onClick={handleSubmit} edge='end'>
 								<DoneIcon />
 							</IconButton>
 						</InputAdornment>
 					),
 				},
 			}}
+			onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
 		/>
 	);
 }
