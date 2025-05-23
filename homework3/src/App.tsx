@@ -9,7 +9,7 @@ const ref = useRef<HTMLDivElement>(null);
 
   const [ref2, isHover] = useHover<HTMLHeadingElement>();
 
-  const [data, loading, error] = useFetch<Todo>(
+  const [data, loading, error] = useFetch<Todo[]>(
     "https://jsonplaceholder.typicode.com/todos"
   );
 

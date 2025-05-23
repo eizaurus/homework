@@ -6,7 +6,7 @@ export const useClickOutside = <T extends HTMLElement>(
 ): void => {
   useEffect(() => {
     const handler: EventListener = (e) => {
-      if (ref.current && ref.current.contains(e.target as Node)) {
+      if (ref.current && ref.current?.contains(e.target as Node)) {
         callback(true);
         console.log("Клик по блоку");
       } else {
@@ -26,7 +26,7 @@ export const useHover = <T extends HTMLElement>(): [ref:RefObject<T|null>, hover
   const [hover, setHovered] = useState(false);
   useEffect(() => {
     const handler: EventListener = (e) => {
-      if (ref.current && ref.current.contains(e.target as Node)) {
+      if (ref.current && ref.current?.contains(e.target as Node)) {
         setHovered(true);
         console.log("Мышка навелась");
       } else {
